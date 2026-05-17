@@ -684,18 +684,30 @@ async function sendMessage() {
     'Currently focused on: ' + currentStateName + ' (' + currentState + ')';
 
   try {
-    var response = await fetch('https://api.anthropic.com/v1/messages', {
+    // Build Gemini messages - combine system prompt with history
+    var geminiMessages = [{role:'user',parts:[{text:systemPrompt+' User question: '+text}]}];
+    if (chatHistory.length > 2) {
+      geminiMessages = [];
+      for (var hi=0; hi<chatHistory.length-1; hi++) {
+        var hm = chatHistory[hi];
+        geminiMessages.push({role: hm.role==='assistant'?'model':'user', parts:[{text:hm.content}]});
+      }
+      geminiMessages.push({role:'user', parts:[{text:systemPrompt+' '+text}]});
+    }
+    var geminiKey = 'AIzaSyBQgW5H_0tHwKgKVdfA1a3uLCmYcqE3qtw';
+    var geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+geminiKey;
+    var response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: chatHistory
+        contents: geminiMessages,
+        generationConfig: { maxOutputTokens: 1500, temperature: 0.3 }
       })
     });
     var data = await response.json();
-    var reply = data.content && data.content[0] ? data.content[0].text : 'Sorry, I could not get a response. Please try again.';
+    var reply = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0])
+      ? data.candidates[0].content.parts[0].text
+      : 'Sorry, I could not get a response. Please try again.';
     hideTyping();
     addMessage('assistant', reply);
     chatHistory.push({ role: 'assistant', content: reply });
