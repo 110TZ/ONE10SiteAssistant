@@ -694,8 +694,8 @@ async function sendMessage() {
       }
       geminiMessages.push({role:'user', parts:[{text:systemPrompt+' '+text}]});
     }
-    var geminiKey = 'AIzaSyBQgW5H_0tHwKgKVdfA1a3uLCmYcqE3qtw';
-    var geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+geminiKey;
+    var geminiKey = 'AIzaSyDI9soyfPa99ozaKI158u99pI4VQGhY8mo';
+    var geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key='+geminiKey;
     var response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -705,9 +705,10 @@ async function sendMessage() {
       })
     });
     var data = await response.json();
+    console.log('Gemini response:', JSON.stringify(data));
     var reply = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0])
       ? data.candidates[0].content.parts[0].text
-      : 'Sorry, I could not get a response. Please try again.';
+      : (data.error ? 'Error: ' + data.error.message : 'Sorry, I could not get a response. Please try again.');
     hideTyping();
     addMessage('assistant', reply);
     chatHistory.push({ role: 'assistant', content: reply });
