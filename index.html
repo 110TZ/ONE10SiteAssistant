@@ -694,7 +694,7 @@ async function sendMessage() {
       }
       geminiMessages.push({role:'user', parts:[{text:systemPrompt+' '+text}]});
     }
-    var geminiKey = 'AIzaSyDI9soyfPa99ozaKI158u99pI4VQGhY8mo';
+    var geminiKey = 'AIzaSyANtX46DAr1BFuFFodxw-Pfo25KecgMk3E';
     var geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+geminiKey;
     var response = await fetch(geminiUrl, {
       method: 'POST',
