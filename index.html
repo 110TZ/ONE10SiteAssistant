@@ -685,29 +685,24 @@ async function sendMessage() {
 
   try {
     // Build Gemini messages - combine system prompt with history
-    var geminiMessages = [{role:'user',parts:[{text:systemPrompt+' User question: '+text}]}];
-    if (chatHistory.length > 2) {
-      geminiMessages = [];
-      for (var hi=0; hi<chatHistory.length-1; hi++) {
-        var hm = chatHistory[hi];
-        geminiMessages.push({role: hm.role==='assistant'?'model':'user', parts:[{text:hm.content}]});
-      }
-      geminiMessages.push({role:'user', parts:[{text:systemPrompt+' '+text}]});
+    var orMessages = [{role:'system',content:systemPrompt}];
+    for (var hi=0; hi<chatHistory.length-1; hi++) {
+      orMessages.push({role:chatHistory[hi].role, content:chatHistory[hi].content});
     }
-    var geminiKey = 'AIzaSyDI9soyfPa99ozaKI158u99pI4VQGhY8mo';
-    var geminiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key='+geminiKey;
-    var response = await fetch(geminiUrl, {
+    orMessages.push({role:'user', content:text});
+    var response = await fetch('https://one10-proxy.zaidi-t.workers.dev', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        contents: geminiMessages,
-        generationConfig: { maxOutputTokens: 1500, temperature: 0.3 }
+        model: 'meta-llama/llama-3.2-3b-instruct:free',
+        messages: orMessages,
+        max_tokens: 1500,
+        temperature: 0.3
       })
     });
     var data = await response.json();
-    console.log('Gemini response:', JSON.stringify(data));
-    var reply = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0])
-      ? data.candidates[0].content.parts[0].text
+    var reply = (data.choices && data.choices[0] && data.choices[0].message)
+      ? data.choices[0].message.content
       : (data.error ? 'Error: ' + data.error.message : 'Sorry, I could not get a response. Please try again.');
     hideTyping();
     addMessage('assistant', reply);
