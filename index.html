@@ -694,8 +694,8 @@ async function sendMessage() {
       }
       geminiMessages.push({role:'user', parts:[{text:systemPrompt+' '+text}]});
     }
-    var geminiKey = 'AIzaSyBgn_R8IusCVZVh_eoVu4D3P1_BA6IXfLs';
-    var geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+geminiKey;
+    var geminiKey = 'AIzaSyDI9soyfPa99ozaKI158u99pI4VQGhY8mo';
+    var geminiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key='+geminiKey;
     var response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
