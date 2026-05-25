@@ -865,14 +865,14 @@ function sendMessage() {
 
   var messages = [{'role':'user','content': systemPrompt + ' Question: ' + text}];
 
-  fetch('https://router.huggingface.co/novita/v3/openai/chat/completions', {
+  fetch('https://router.huggingface.co/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': 'Bearer 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',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: 'meta-llama/llama-3.3-70b-instruct',
+      model: 'meta-llama/Llama-3.3-70B-Instruct:novita',
       messages: messages,
       max_tokens: 1000,
       temperature: 0.3
