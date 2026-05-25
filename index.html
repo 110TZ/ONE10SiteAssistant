@@ -880,9 +880,10 @@ function sendMessage() {
   }).then(function(r) { return r.json(); })
   .then(function(data) {
     hideTyping();
+    console.log('HF response:', JSON.stringify(data).substring(0,500));
     var reply = (data.choices && data.choices[0] && data.choices[0].message)
       ? data.choices[0].message.content
-      : (data.error ? 'Error: ' + data.error.message : null);
+      : (data.error ? 'Error: ' + (data.error.message || JSON.stringify(data.error)) : 'Raw: ' + JSON.stringify(data).substring(0,200));
     if (!reply && results.length > 0) {
       reply = results[0].item.a;
     } else if (!reply) {
